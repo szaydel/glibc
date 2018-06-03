@@ -687,8 +687,9 @@ extern int __vswprintf_internal (wchar_t *string, size_t maxlen,
                                  unsigned int mode_flags);
 
 /* Flags for __v*printf_internal.  */
-#define PRINTF_LDBL_IS_DBL 0x0001
-#define PRINTF_FORTIFY     0x0002
+#define PRINTF_LDBL_IS_DBL		0x0001
+#define PRINTF_FORTIFY			0x0002
+#define PRINTF_LDBL_USES_FLOAT128	0x0004
 
 extern size_t _IO_getline (FILE *,char *, size_t, int, int);
 libc_hidden_proto (_IO_getline)
