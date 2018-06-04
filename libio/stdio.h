@@ -387,9 +387,11 @@ extern int scanf (const char *__restrict __format, ...) __wur;
 extern int sscanf (const char *__restrict __s,
 		   const char *__restrict __format, ...) __THROW;
 
+#include <bits/floatn.h>
 #if defined __USE_ISOC99 && !defined __USE_GNU \
     && (!defined __LDBL_COMPAT || !defined __REDIRECT) \
-    && (defined __STRICT_ANSI__ || defined __USE_XOPEN2K)
+    && (defined __STRICT_ANSI__ || defined __USE_XOPEN2K) \
+    && (!__LONG_DOUBLE_USES_FLOAT128)
 # ifdef __REDIRECT
 /* For strict ISO C99 or POSIX compliance disallow %as, %aS and %a[
    GNU extension which conflicts with valid %a followed by letter
@@ -437,7 +439,8 @@ extern int vsscanf (const char *__restrict __s,
 
 # if !defined __USE_GNU \
      && (!defined __LDBL_COMPAT || !defined __REDIRECT) \
-     && (defined __STRICT_ANSI__ || defined __USE_XOPEN2K)
+     && (defined __STRICT_ANSI__ || defined __USE_XOPEN2K) \
+     && (!__LONG_DOUBLE_USES_FLOAT128)
 #  ifdef __REDIRECT
 /* For strict ISO C99 or POSIX compliance disallow %as, %aS and %a[
    GNU extension which conflicts with valid %a followed by letter
@@ -862,6 +865,17 @@ extern int __overflow (FILE *, int);
 #endif
 #ifdef __LDBL_COMPAT
 # include <bits/stdio-ldbl.h>
+#endif
+
+/* XXX: DO NOT COMMIT.
+
+   On powerpc64le, the implementation of long double with IEEE binary128
+   format is not complete.  The redirections of the stdio.h functions
+   are supposed to be implemented in bits/stdio-ldbl.h, however, we can
+   only redirect all or none.  In the meantime, bits/stdio-ieee128.h
+   allows us to redirect part of them for testing purposes.  */
+#if __LONG_DOUBLE_USES_FLOAT128
+# include <bits/stdio-ieee128.h>
 #endif
 
 __END_DECLS

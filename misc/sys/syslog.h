@@ -210,6 +210,17 @@ extern void vsyslog (int __pri, const char *__fmt, __gnuc_va_list __ap)
 # include <bits/syslog-ldbl.h>
 #endif
 
+/* XXX: DO NOT COMMIT.
+
+   On powerpc64le, the implementation of long double with IEEE binary128
+   format is not complete.  The redirections of the syslog.h functions
+   are supposed to be implemented in bits/syslog-ldbl.h, however, we can
+   only redirect all or none.  In the meantime, bits/syslog-ieee128.h
+   allows us to redirect part of them for testing purposes.  */
+#if __LONG_DOUBLE_USES_FLOAT128
+# include <bits/syslog-ieee128.h>
+#endif
+
 __END_DECLS
 
 #endif /* sys/syslog.h */

@@ -48,8 +48,24 @@ extern unsigned int error_message_count;
 extern int error_one_per_line;
 
 
-#if defined __extern_always_inline && defined __va_arg_pack
-# include <bits/error.h>
+/* XXX: DO NOT COMMIT.
+
+   On powerpc64le, the implementation of long double with IEEE binary128
+   format is not complete.  The redirections of the error.h functions
+   are temporarily implemented in bits/error-ieee128.h.  */
+#include <bits/floatn.h>
+#if __HAVE_DISTINCT_FLOAT128 && __LDBL_MANT_DIG__ == 113 && \
+    ! defined __BUILDING_EXTRA_LDBL_FORMAT
+# include <bits/error-ieee128.h>
+#else
+
+/* XXX: The following redirections cause calls to error_at_line and
+   error to be always inlined.  That doesn't work with ieee128
+   redirections, yet.  */
+# if defined __extern_always_inline && defined __va_arg_pack
+#  include <bits/error.h>
+# endif
+
 #endif
 
 __END_DECLS

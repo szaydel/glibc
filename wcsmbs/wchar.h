@@ -634,7 +634,8 @@ extern int swscanf (const wchar_t *__restrict __s,
 
 # if defined __USE_ISOC99 && !defined __USE_GNU \
      && (!defined __LDBL_COMPAT || !defined __REDIRECT) \
-     && (defined __STRICT_ANSI__ || defined __USE_XOPEN2K)
+     && (defined __STRICT_ANSI__ || defined __USE_XOPEN2K) \
+     && (!__LONG_DOUBLE_USES_FLOAT128)
 #  ifdef __REDIRECT
 /* For strict ISO C99 or POSIX compliance disallow %as, %aS and %a[
    GNU extension which conflicts with valid %a followed by letter
@@ -689,7 +690,8 @@ extern int vswscanf (const wchar_t *__restrict __s,
 
 # if !defined __USE_GNU \
      && (!defined __LDBL_COMPAT || !defined __REDIRECT) \
-     && (defined __STRICT_ANSI__ || defined __USE_XOPEN2K)
+     && (defined __STRICT_ANSI__ || defined __USE_XOPEN2K) \
+     && (!__LONG_DOUBLE_USES_FLOAT128)
 #  ifdef __REDIRECT
 extern int __REDIRECT (vfwscanf, (__FILE *__restrict __s,
 				  const wchar_t *__restrict __format,
@@ -852,6 +854,17 @@ extern size_t wcsftime_l (wchar_t *__restrict __s, size_t __maxsize,
 
 #ifdef __LDBL_COMPAT
 # include <bits/wchar-ldbl.h>
+#endif
+
+/* XXX: DO NOT COMMIT.
+
+   On powerpc64le, the implementation of long double with IEEE binary128
+   format is not complete.  The redirections of the wchar.h functions
+   are supposed to be implemented in bits/wchar-ldbl.h, however, we can
+   only redirect all or none.  In the meantime, bits/wchar-ieee128.h
+   allows us to redirect part of them for testing purposes.  */
+#if __LONG_DOUBLE_USES_FLOAT128
+# include <bits/wchar-ieee128.h>
 #endif
 
 __END_DECLS

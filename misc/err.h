@@ -54,4 +54,16 @@ extern void verrx (int __status, const char *, __gnuc_va_list)
 
 __END_DECLS
 
+/* XXX: DO NOT COMMIT.
+
+   On powerpc64le, the implementation of long double with IEEE binary128
+   format is not complete.  The redirections of the err.h functions
+   are temporarily implemented in bits/err-ieee128.h.  */
+#include <bits/floatn.h>
+#if __HAVE_DISTINCT_FLOAT128 && __LDBL_MANT_DIG__ == 113 && \
+    ! defined __BUILDING_EXTRA_LDBL_FORMAT
+# include <bits/err-ieee128.h>
+#endif
+
+
 #endif	/* err.h */

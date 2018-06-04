@@ -186,6 +186,17 @@ extern int printf_size_info (const struct printf_info *__restrict
 # include <bits/printf-ldbl.h>
 #endif
 
+/* XXX: DO NOT COMMIT.
+
+   On powerpc64le, the implementation of long double with IEEE binary128
+   format is not complete.  The redirections of the printf.h functions
+   are supposed to be implemented in bits/printf-ldbl.h, however, we can
+   only redirect all or none.  In the meantime, bits/printf-ieee128.h
+   allows us to redirect part of them for testing purposes.  */
+#if __LONG_DOUBLE_USES_FLOAT128
+# include <bits/printf-ieee128.h>
+#endif
+
 __END_DECLS
 
 #endif /* printf.h  */
