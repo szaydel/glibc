@@ -27,6 +27,10 @@
 #define flockfile(s) _IO_flockfile (s)
 #define funlockfile(s) _IO_funlockfile (s)
 
+#ifdef _LIBC
+# include <../libio/libioP.h>
+#endif
+
 extern char *__progname;
 
 #define VA(call)							      \
@@ -38,7 +42,8 @@ extern char *__progname;
 }
 
 static void
-convert_and_print (const char *format, __gnuc_va_list ap)
+convert_and_print (const char *format, __gnuc_va_list ap,
+		   unsigned int mode_flags)
 {
 #define ALLOCA_LIMIT	2000
   size_t len;
@@ -79,32 +84,33 @@ convert_and_print (const char *format, __gnuc_va_list ap)
     /* The string cannot be converted.  */
     wformat = (wchar_t *) L"???";
 
-  __vfwprintf (stderr, wformat, ap);
+  __vfwprintf_internal (stderr, wformat, ap, mode_flags);
 }
 
 void
-vwarnx (const char *format, __gnuc_va_list ap)
+__vwarnx_internal (const char *format, __gnuc_va_list ap,
+		   unsigned int mode_flags)
 {
   flockfile (stderr);
   if (_IO_fwide (stderr, 0) > 0)
     {
       __fwprintf (stderr, L"%s: ", __progname);
-      convert_and_print (format, ap);
+      convert_and_print (format, ap, mode_flags);
       putwc_unlocked (L'\n', stderr);
     }
   else
     {
       fprintf (stderr, "%s: ", __progname);
       if (format)
-	vfprintf (stderr, format, ap);
+	__vfprintf_internal (stderr, format, ap, mode_flags);
       putc_unlocked ('\n', stderr);
     }
   funlockfile (stderr);
 }
-libc_hidden_def (vwarnx)
 
 void
-vwarn (const char *format, __gnuc_va_list ap)
+__vwarn_internal (const char *format, __gnuc_va_list ap,
+		   unsigned int mode_flags)
 {
   int error = errno;
 
@@ -114,7 +120,7 @@ vwarn (const char *format, __gnuc_va_list ap)
       __fwprintf (stderr, L"%s: ", __progname);
       if (format)
 	{
-	  convert_and_print (format, ap);
+	  convert_and_print (format, ap, mode_flags);
 	  fputws_unlocked (L": ", stderr);
 	}
       __set_errno (error);
@@ -125,7 +131,7 @@ vwarn (const char *format, __gnuc_va_list ap)
       fprintf (stderr, "%s: ", __progname);
       if (format)
 	{
-	  vfprintf (stderr, format, ap);
+	  __vfprintf_internal (stderr, format, ap, mode_flags);
 	  fputs_unlocked (": ", stderr);
 	}
       __set_errno (error);
@@ -133,8 +139,20 @@ vwarn (const char *format, __gnuc_va_list ap)
     }
   funlockfile (stderr);
 }
+
+void
+vwarn (const char *format, __gnuc_va_list ap)
+{
+  __vwarn_internal (format, ap, 0);
+}
 libc_hidden_def (vwarn)
 
+void
+vwarnx (const char *format, __gnuc_va_list ap)
+{
+  __vwarnx_internal (format, ap, 0);
+}
+libc_hidden_def (vwarnx)
 
 void
 warn (const char *format, ...)

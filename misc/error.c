@@ -39,6 +39,7 @@
 # include <stdbool.h>
 # include <stdint.h>
 # include <wchar.h>
+# include <../libio/libioP.h>
 # define mbsrtowcs __mbsrtowcs
 # define USE_UNLOCKED_IO 0
 # define _GL_ATTRIBUTE_FORMAT_PRINTF(a, b)
@@ -200,7 +201,8 @@ print_errno_message (int errnum)
 }
 
 static void _GL_ATTRIBUTE_FORMAT_PRINTF (3, 0) _GL_ARG_NONNULL ((3))
-error_tail (int status, int errnum, const char *message, va_list args)
+error_tail (int status, int errnum, const char *message, va_list args,
+	    unsigned int mode_flags)
 {
 #if _LIBC
   if (_IO_fwide (stderr, 0) > 0)
@@ -261,14 +263,14 @@ error_tail (int status, int errnum, const char *message, va_list args)
 	  wmessage = (wchar_t *) L"???";
 	}
 
-      __vfwprintf (stderr, wmessage, args);
+      __vfwprintf_internal (stderr, wmessage, args, mode_flags);
 
       if (use_malloc)
 	free (wmessage);
     }
   else
 #endif
-    vfprintf (stderr, message, args);
+    __vfprintf_internal (stderr, message, args, mode_flags);
   va_end (args);
 
   ++error_message_count;
@@ -290,10 +292,9 @@ error_tail (int status, int errnum, const char *message, va_list args)
    If ERRNUM is nonzero, print its corresponding system error message.
    Exit with status STATUS if it is nonzero.  */
 void
-error (int status, int errnum, const char *message, ...)
+__error_internal (int status, int errnum, const char *message,
+		  va_list args, unsigned int mode_flags)
 {
-  va_list args;
-
 #if defined _LIBC && defined __libc_ptf_call
   /* We do not want this call to be cut short by a thread
      cancellation.  Therefore disable cancellation for now.  */
@@ -317,8 +318,7 @@ error (int status, int errnum, const char *message, ...)
 #endif
     }
 
-  va_start (args, message);
-  error_tail (status, errnum, message, args);
+  error_tail (status, errnum, message, args, mode_flags);
 
 #ifdef _LIBC
   _IO_funlockfile (stderr);
@@ -327,17 +327,25 @@ error (int status, int errnum, const char *message, ...)
 # endif
 #endif
 }
+
+void
+error (int status, int errnum, const char *message, ...)
+{
+  va_list ap;
+  va_start (ap, message);
+  __error_internal (status, errnum, message, ap, 0);
+  va_end (ap);
+}
 
 /* Sometimes we want to have at most one error per line.  This
    variable controls whether this mode is selected or not.  */
 int error_one_per_line;
 
 void
-error_at_line (int status, int errnum, const char *file_name,
-	       unsigned int line_number, const char *message, ...)
+__error_at_line_internal (int status, int errnum, const char *file_name,
+			  unsigned int line_number, const char *message,
+			  va_list args, unsigned int mode_flags)
 {
-  va_list args;
-
   if (error_one_per_line)
     {
       static const char *old_file_name;
@@ -388,8 +396,7 @@ error_at_line (int status, int errnum, const char *file_name,
 	   file_name, line_number);
 #endif
 
-  va_start (args, message);
-  error_tail (status, errnum, message, args);
+  error_tail (status, errnum, message, args, mode_flags);
 
 #ifdef _LIBC
   _IO_funlockfile (stderr);
@@ -397,6 +404,17 @@ error_at_line (int status, int errnum, const char *file_name,
   __libc_ptf_call (__pthread_setcancelstate, (state, NULL), 0);
 # endif
 #endif
+}
+
+void
+error_at_line (int status, int errnum, const char *file_name,
+	       unsigned int line_number, const char *message, ...)
+{
+  va_list ap;
+  va_start (ap, message);
+  __error_at_line_internal (status, errnum, file_name, line_number,
+			    message, ap, 0);
+  va_end (ap);
 }
 
 #ifdef _LIBC
