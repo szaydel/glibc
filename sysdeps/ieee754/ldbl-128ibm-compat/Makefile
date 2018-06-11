@@ -45,12 +45,22 @@ routines += ieee128-vfwprintf_chk
 routines += ieee128-vswprintf_chk
 routines += ieee128-vwprintf_chk
 
+routines += ieee128-fscanf
+routines += ieee128-scanf
+routines += ieee128-sscanf
+
+routines += ieee128-vfscanf
+routines += ieee128-vscanf
+routines += ieee128-vsscanf
+
 # Printing long double values with IEEE binary128 format reuses part
 # of the internal float128 implementation (__printf_fp, __printf_fphex,
-# and __float128 variables and union members).  Thus, the compilation of
-# the following functions, must have -mfloat128 passed to the compiler.
+# and __float128 variables and union members).  Likewise, reading these
+# values reuses __strtof128_internal.  Thus, the compilation of the
+# following functions, must have -mfloat128 passed to the compiler.
 CFLAGS-vfprintf-internal.c += -mfloat128
 CFLAGS-vfwprintf-internal.c += -mfloat128
+CFLAGS-vfscanf-internal.c += -mfloat128
 
 # Basic tests for the implementation of long double with IEEE binary128
 # format and for the related redirections in installed headers.
@@ -70,6 +80,12 @@ tests-internal += test-wprintf-chk-ieee128 test-wprintf-chk-ibm128
 CFLAGS-test-wprintf-chk-ieee128.c += -mfloat128 -mabi=ieeelongdouble -Wno-psabi
 CFLAGS-test-wprintf-chk-ibm128.c += -mabi=ibmlongdouble -Wno-psabi
 
+tests-internal += test-scanf-ieee128 test-scanf-ibm128
+CFLAGS-test-scanf-ieee128.c += -mfloat128 -mabi=ieeelongdouble -Wno-psabi
+CFLAGS-test-scanf-ibm128.c += -mabi=ibmlongdouble -Wno-psabi
+
+$(objpfx)test-scanf-ieee128: gnulib-tests += $(f128-loader-link)
+
 ifeq ($(run-built-tests),yes)
 tests-special += $(objpfx)test-printf-ieee128.out
 tests-special += $(objpfx)test-printf-ibm128.out
@@ -82,6 +98,9 @@ tests-special += $(objpfx)test-printf-chk-ibm128.out
 
 tests-special += $(objpfx)test-wprintf-chk-ieee128.out
 tests-special += $(objpfx)test-wprintf-chk-ibm128.out
+
+tests-special += $(objpfx)test-scanf-ieee128.out
+tests-special += $(objpfx)test-scanf-ibm128.out
 endif
 
 $(objpfx)test-printf-ieee128.out: \
@@ -129,6 +148,18 @@ $(objpfx)test-wprintf-chk-ieee128.out: \
 $(objpfx)test-wprintf-chk-ibm128.out: \
   ../sysdeps/ieee754/ldbl-128ibm-compat/test-wprintf-chk-ldbl-compat.sh \
   $(objpfx)test-wprintf-chk-ibm128
+	$(SHELL) $^ '$(test-program-prefix)' $@; \
+	$(evaluate-test)
+
+$(objpfx)test-scanf-ieee128.out: \
+  ../sysdeps/ieee754/ldbl-128ibm-compat/test-scanf-ldbl-compat.sh \
+  $(objpfx)test-scanf-ieee128
+	$(SHELL) $^ '$(test-program-prefix)' $@; \
+	$(evaluate-test)
+
+$(objpfx)test-scanf-ibm128.out: \
+  ../sysdeps/ieee754/ldbl-128ibm-compat/test-scanf-ldbl-compat.sh \
+  $(objpfx)test-scanf-ibm128
 	$(SHELL) $^ '$(test-program-prefix)' $@; \
 	$(evaluate-test)
 endif
