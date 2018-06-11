@@ -37,6 +37,14 @@ routines += ieee128-vprintf_chk
 routines += ieee128-vsnprintf_chk
 routines += ieee128-vsprintf_chk
 
+routines += ieee128-fwprintf_chk
+routines += ieee128-swprintf_chk
+routines += ieee128-wprintf_chk
+
+routines += ieee128-vfwprintf_chk
+routines += ieee128-vswprintf_chk
+routines += ieee128-vwprintf_chk
+
 # Printing long double values with IEEE binary128 format reuses part
 # of the internal float128 implementation (__printf_fp, __printf_fphex,
 # and __float128 variables and union members).  Thus, the compilation of
@@ -58,6 +66,10 @@ tests-internal += test-printf-chk-ieee128 test-printf-chk-ibm128
 CFLAGS-test-printf-chk-ieee128.c += -mfloat128 -mabi=ieeelongdouble -Wno-psabi
 CFLAGS-test-printf-chk-ibm128.c += -mabi=ibmlongdouble -Wno-psabi
 
+tests-internal += test-wprintf-chk-ieee128 test-wprintf-chk-ibm128
+CFLAGS-test-wprintf-chk-ieee128.c += -mfloat128 -mabi=ieeelongdouble -Wno-psabi
+CFLAGS-test-wprintf-chk-ibm128.c += -mabi=ibmlongdouble -Wno-psabi
+
 ifeq ($(run-built-tests),yes)
 tests-special += $(objpfx)test-printf-ieee128.out
 tests-special += $(objpfx)test-printf-ibm128.out
@@ -67,6 +79,9 @@ tests-special += $(objpfx)test-wprintf-ibm128.out
 
 tests-special += $(objpfx)test-printf-chk-ieee128.out
 tests-special += $(objpfx)test-printf-chk-ibm128.out
+
+tests-special += $(objpfx)test-wprintf-chk-ieee128.out
+tests-special += $(objpfx)test-wprintf-chk-ibm128.out
 endif
 
 $(objpfx)test-printf-ieee128.out: \
@@ -102,6 +117,18 @@ $(objpfx)test-printf-chk-ieee128.out: \
 $(objpfx)test-printf-chk-ibm128.out: \
   ../sysdeps/ieee754/ldbl-128ibm-compat/test-printf-chk-ldbl-compat.sh \
   $(objpfx)test-printf-chk-ibm128
+	$(SHELL) $^ '$(test-program-prefix)' $@; \
+	$(evaluate-test)
+
+$(objpfx)test-wprintf-chk-ieee128.out: \
+  ../sysdeps/ieee754/ldbl-128ibm-compat/test-wprintf-chk-ldbl-compat.sh \
+  $(objpfx)test-wprintf-chk-ieee128
+	$(SHELL) $^ '$(test-program-prefix)' $@; \
+	$(evaluate-test)
+
+$(objpfx)test-wprintf-chk-ibm128.out: \
+  ../sysdeps/ieee754/ldbl-128ibm-compat/test-wprintf-chk-ldbl-compat.sh \
+  $(objpfx)test-wprintf-chk-ibm128
 	$(SHELL) $^ '$(test-program-prefix)' $@; \
 	$(evaluate-test)
 endif
