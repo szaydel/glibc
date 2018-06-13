@@ -193,3 +193,49 @@ $(objpfx)test-wscanf-ibm128.out: \
 	$(SHELL) $^ '$(test-program-prefix)' $@; \
 	$(evaluate-test)
 endif
+
+ifeq ($(subdir),argp)
+# Wrappers for argp functions that take long double arguments with
+# IEEE binary128 format
+routines += ieee128-argp_error
+routines += ieee128-argp_failure
+
+tests-internal += test-argp-error-ieee128 test-argp-error-ibm128
+CFLAGS-test-argp-error-ieee128.c += -mfloat128 -mabi=ieeelongdouble -Wno-psabi
+CFLAGS-test-argp-error-ibm128.c += -mabi=ibmlongdouble -Wno-psabi
+
+tests-internal += test-argp-failure-ieee128 test-argp-failure-ibm128
+CFLAGS-test-argp-failure-ieee128.c += -mfloat128 -mabi=ieeelongdouble -Wno-psabi
+CFLAGS-test-argp-failure-ibm128.c += -mabi=ibmlongdouble -Wno-psabi
+
+ifeq ($(run-built-tests),yes)
+tests-special += $(objpfx)test-argp-error-ieee128.out
+tests-special += $(objpfx)test-argp-error-ibm128.out
+tests-special += $(objpfx)test-argp-failure-ieee128.out
+tests-special += $(objpfx)test-argp-failure-ibm128.out
+endif
+
+$(objpfx)test-argp-error-ieee128.out: \
+  ../sysdeps/ieee754/ldbl-128ibm-compat/test-argp-error-ldbl-compat.sh \
+  $(objpfx)test-argp-error-ieee128
+	$(SHELL) $^ '$(test-program-prefix)' $@; \
+	$(evaluate-test)
+
+$(objpfx)test-argp-error-ibm128.out: \
+  ../sysdeps/ieee754/ldbl-128ibm-compat/test-argp-error-ldbl-compat.sh \
+  $(objpfx)test-argp-error-ibm128
+	$(SHELL) $^ '$(test-program-prefix)' $@; \
+	$(evaluate-test)
+
+$(objpfx)test-argp-failure-ieee128.out: \
+  ../sysdeps/ieee754/ldbl-128ibm-compat/test-argp-failure-ldbl-compat.sh \
+  $(objpfx)test-argp-failure-ieee128
+	$(SHELL) $^ '$(test-program-prefix)' $@; \
+	$(evaluate-test)
+
+$(objpfx)test-argp-failure-ibm128.out: \
+  ../sysdeps/ieee754/ldbl-128ibm-compat/test-argp-failure-ldbl-compat.sh \
+  $(objpfx)test-argp-failure-ibm128
+	$(SHELL) $^ '$(test-program-prefix)' $@; \
+	$(evaluate-test)
+endif
