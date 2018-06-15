@@ -239,3 +239,9 @@ $(objpfx)test-argp-failure-ibm128.out: \
 	$(SHELL) $^ '$(test-program-prefix)' $@; \
 	$(evaluate-test)
 endif
+
+ifeq ($(subdir),misc)
+# Wrappers for err.h functions that take long double arguments with
+# IEEE binary128 format
+routines += ieee128-err
+endif
