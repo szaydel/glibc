@@ -244,4 +244,5 @@ ifeq ($(subdir),misc)
 # Wrappers for err.h functions that take long double arguments with
 # IEEE binary128 format
 routines += ieee128-err
+routines += ieee128-error
 endif
