@@ -50,21 +50,22 @@ do_test_call_varg (FILE *stream, const wchar_t *format, ...)
 }
 
 static void
-do_test_call_rarg (FILE *stream, const wchar_t *format, long double ld)
+do_test_call_rarg (FILE *stream, const wchar_t *format, long double ld,
+		   double d)
 {
   wchar_t string[128];
 
   wprintf (L"%20Ls", L"fwprintf: ");
-  fwprintf (stream, format, ld);
+  fwprintf (stream, format, ld, d);
   wprintf (L"\n");
 
   wprintf (L"%20Ls", L"swprintf: ");
-  swprintf (string, 127, format, ld);
+  swprintf (string, 127, format, ld, d);
   wprintf (L"%Ls", string);
   wprintf (L"\n");
 
   wprintf (L"%20Ls", L"wprintf: ");
-  wprintf (format, ld);
+  wprintf (format, ld, d);
   wprintf (L"\n");
 }
 
@@ -72,14 +73,15 @@ static int
 do_test (void)
 {
   long double ld = -1;
+  double d = -1;
 
   /* Print in decimal notation.  */
-  do_test_call_rarg (stdout, L"%.60Lf", ld);
-  do_test_call_varg (stdout, L"%.60Lf", ld);
+  do_test_call_rarg (stdout, L"%.60Lf, %f", ld, d);
+  do_test_call_varg (stdout, L"%.60Lf, %f", ld, d);
 
   /* Print in hexadecimal notation.  */
-  do_test_call_rarg (stdout, L"%.60La", ld);
-  do_test_call_varg (stdout, L"%.60La", ld);
+  do_test_call_rarg (stdout, L"%.60La, %a", ld, d);
+  do_test_call_varg (stdout, L"%.60La, %a", ld, d);
 
   return 0;
 }

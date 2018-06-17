@@ -76,13 +76,13 @@ do_test_call_varg (FILE *stream, const char *format, ...)
 }
 
 static void
-do_test_call_rarg (FILE *stream, const char *format, long double ld)
+do_test_call_rarg (FILE *stream, const char *format, long double ld, double d)
 {
   char *buffer = NULL;
   char string[128];
 
   printf ("%20s", "asprintf: ");
-  asprintf (&buffer, format, ld);
+  asprintf (&buffer, format, ld, d);
   if (buffer == NULL)
     printf ("Error using asprintf\n");
   else
@@ -93,24 +93,24 @@ do_test_call_rarg (FILE *stream, const char *format, long double ld)
   printf ("\n");
 
   printf ("%20s", "dprintf: ");
-  dprintf (1, format, ld);
+  dprintf (1, format, ld, d);
   printf ("\n");
 
   printf ("%20s", "fprintf: ");
-  fprintf (stdout, format, ld);
+  fprintf (stdout, format, ld, d);
   printf ("\n");
 
   printf ("%20s", "printf: ");
-  printf (format, ld);
+  printf (format, ld, d);
   printf ("\n");
 
   printf ("%20s", "snprintf: ");
-  snprintf (string, 127, format, ld);
+  snprintf (string, 127, format, ld, d);
   printf ("%s", string);
   printf ("\n");
 
   printf ("%20s", "sprintf: ");
-  sprintf (string, format, ld);
+  sprintf (string, format, ld, d);
   printf ("%s", string);
   printf ("\n");
 }
@@ -119,14 +119,15 @@ static int
 do_test (void)
 {
   long double ld = -1;
+  double d = -1;
 
   /* Print in decimal notation.  */
-  do_test_call_rarg (stdout, "%.60Lf", ld);
-  do_test_call_varg (stdout, "%.60Lf", ld);
+  do_test_call_rarg (stdout, "%.60Lf, %f", ld, d);
+  do_test_call_varg (stdout, "%.60Lf, %f", ld, d);
 
   /* Print in hexadecimal notation.  */
-  do_test_call_rarg (stdout, "%.60La", ld);
-  do_test_call_varg (stdout, "%.60La", ld);
+  do_test_call_rarg (stdout, "%.60La, %a", ld, d);
+  do_test_call_varg (stdout, "%.60La, %a", ld, d);
 
   return 0;
 }
