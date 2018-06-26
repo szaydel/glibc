@@ -45,6 +45,10 @@ routines += ieee128-vfwprintf_chk
 routines += ieee128-vswprintf_chk
 routines += ieee128-vwprintf_chk
 
+routines += ieee128-obprintf
+routines += ieee128-obstack_chk
+routines += ieee128-vobstack_chk
+
 routines += ieee128-fscanf
 routines += ieee128-scanf
 routines += ieee128-sscanf
@@ -104,6 +108,14 @@ CFLAGS-test-printf-chk-ibm128.c += -mabi=ibmlongdouble -Wno-psabi
 tests-internal += test-wprintf-chk-ieee128 test-wprintf-chk-ibm128
 CFLAGS-test-wprintf-chk-ieee128.c += -mfloat128 -mabi=ieeelongdouble -Wno-psabi
 CFLAGS-test-wprintf-chk-ibm128.c += -mabi=ibmlongdouble -Wno-psabi
+
+tests-internal += test-obstack-ieee128 test-obstack-ibm128
+CFLAGS-test-obstack-ieee128.c += -mfloat128 -mabi=ieeelongdouble -Wno-psabi
+CFLAGS-test-obstack-ibm128.c += -mabi=ibmlongdouble -Wno-psabi
+
+tests-internal += test-obstack-chk-ieee128 test-obstack-chk-ibm128
+CFLAGS-test-obstack-chk-ieee128.c += -mfloat128 -mabi=ieeelongdouble -Wno-psabi
+CFLAGS-test-obstack-chk-ibm128.c += -mabi=ibmlongdouble -Wno-psabi
 
 tests-internal += test-scanf-ieee128 test-scanf-ibm128
 CFLAGS-test-scanf-ieee128.c += -mfloat128 -mabi=ieeelongdouble -Wno-psabi
