@@ -375,7 +375,7 @@ __printf_fp_l (FILE *fp, locale_t loc,
 
   /* Fetch the argument value.	*/
 #if __HAVE_DISTINCT_FLOAT128
-  if (info->is_binary128)
+  if (info->is_binary128 && info->is_long_double)
     PRINTF_FP_FETCH (_Float128, fpnum.f128, float128, FLT128_MANT_DIG)
   else
 #endif

@@ -142,7 +142,7 @@ __printf_size (FILE *fp, const struct printf_info *info,
 
   /* Fetch the argument value.	*/
 #if __HAVE_DISTINCT_FLOAT128
-  if (info->is_binary128)
+  if (info->is_binary128 && info->is_long_double)
     PRINTF_SIZE_FETCH (_Float128, fpnum.f128)
   else
 #endif

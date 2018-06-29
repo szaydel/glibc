@@ -133,9 +133,13 @@ STRFROM (char *dest, size_t size, const char *format, FLOAT f)
   info.is_long_double = __builtin_types_compatible_p (FLOAT, long double);
 
   /* Similarly, the function strfromf128 passes a floating-point number in
-     _Float128 format to printf_fp.  */
+     _Float128 format to __printf_fp.  Setting is_binary128 alone is not
+     enough, because when is_long_double is zero, __printf_fp always treats
+     the floating-point number as double (regardless of is_binary128).  */
 #if __HAVE_DISTINCT_FLOAT128
   info.is_binary128 = __builtin_types_compatible_p (FLOAT, _Float128);
+  if (info.is_binary128)
+    info.is_long_double = 1;
 #endif
 
   /* Set info according to the format string.  */

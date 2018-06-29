@@ -65,13 +65,14 @@ tests := tstscanf test_rdwr test-popen tstgetln test-fseek \
 	 tst-vfprintf-mbs-prec \
 	 tst-scanf-round \
 
-test-srcs = tst-unbputc tst-printf
+test-srcs = tst-unbputc tst-printf tst-isbinary128
 
 ifeq ($(run-built-tests),yes)
 tests-special += $(objpfx)tst-unbputc.out $(objpfx)tst-printf.out \
 		 $(objpfx)tst-printf-bz18872-mem.out \
 		 $(objpfx)tst-setvbuf1-cmp.out \
-		 $(objpfx)tst-vfprintf-width-prec-mem.out
+		 $(objpfx)tst-vfprintf-width-prec-mem.out \
+		 $(objpfx)tst-isbinary128.out
 generated += tst-printf-bz18872.c tst-printf-bz18872.mtrace \
 	     tst-printf-bz18872-mem.out \
 	     tst-vfprintf-width-prec.mtrace tst-vfprintf-width-prec-mem.out
@@ -103,6 +104,10 @@ $(objpfx)tst-unbputc.out: tst-unbputc.sh $(objpfx)tst-unbputc
 
 $(objpfx)tst-printf.out: tst-printf.sh $(objpfx)tst-printf
 	$(SHELL) $< $(common-objpfx) '$(test-program-prefix)' > $@; \
+	$(evaluate-test)
+
+$(objpfx)tst-isbinary128.out: tst-isbinary128.sh $(objpfx)tst-isbinary128
+	$(SHELL) $^ '$(test-program-prefix)' $@; \
 	$(evaluate-test)
 
 # We generate this source because it requires a printf invocation with
