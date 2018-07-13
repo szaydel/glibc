@@ -1,3 +1,15 @@
+2018-07-13  Florian Weimer  <fweimer@redhat.com>
+
+	* support/support_descriptor_supports_holes.c: New file.
+	* support/Makefile (libsupport-routines): Add
+	support_descriptor_supports_holes.
+	* support/support.h (support_descriptor_supports_holes): Declare.
+	* io/tst-copy_file_range.c: Call support_descriptor_supports_holes
+	and stop testing if holes are not supported.
+	* io/test-lfs.c (do_prepare): Likewise.
+	* sysdeps/unix/sysv/linux/tst-fallocate-common.c (do_prepare):
+	Likewise.
+
 2018-07-12  Florian Weimer  <fweimer@redhat.com>
 
 	* nptl/allocatestack.c [_STACK_GROWS_UP] (allocate_stack): Call
